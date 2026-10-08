@@ -1,18 +1,13 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, CalendarDays, Download, Pencil, Plus, Search, Trash2, Wallet, X } from "lucide-react";
-import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, SEED_TRANSACTIONS, Transaction, TransactionType, isTransaction, money, parseMoneyToCents } from "@/lib/expense-data";
-const STORAGE_KEY="financehub:fictional-transactions:v1";
+import { EXPENSE_CATEGORIES, INCOME_CATEGORIES, SEED_TRANSACTIONS, Transaction, TransactionType, money, parseMoneyToCents } from "@/lib/expense-data";
 const initialForm = {date:"2026-10-08",description:"",type:"expense" as TransactionType,category:"Groceries",amount:"",note:""};
 type FormState = typeof initialForm;
 function escapeCsv(v:string){return `"${v.replace(/"/g,'""')}"`}
-export default function Expenses(){
- const [entries,setEntries]=useState<Transaction[]>(SEED_TRANSACTIONS);
- const [loaded,setLoaded]=useState(false);
+export default function Expenses({entries,setEntries}:{entries:Transaction[];setEntries:React.Dispatch<React.SetStateAction<Transaction[]>>}){
  const [search,setSearch]=useState(""); const [typeFilter,setTypeFilter]=useState("all");const [categoryFilter,setCategoryFilter]=useState("all");const [month,setMonth]=useState("all");
  const [modal,setModal]=useState(false);const [editingId,setEditingId]=useState<string|null>(null);const [form,setForm]=useState<FormState>(initialForm);const [error,setError]=useState("");
- useEffect(()=>{try{const raw=localStorage.getItem(STORAGE_KEY);if(raw!==null){const parsed:unknown=JSON.parse(raw);if(Array.isArray(parsed)&&parsed.length<=10000&&parsed.every(isTransaction))setEntries(parsed);}}catch{ /* Use demo data if local storage is unavailable/corrupt. */ }setLoaded(true)},[]);
- useEffect(()=>{if(!loaded)return;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(entries))}catch{ /* Local browser storage may be blocked/full. */ }},[entries,loaded]);
  const months=useMemo(()=>Array.from(new Set(entries.map(t=>t.date.slice(0,7)))).sort().reverse(),[entries]);
  const filtered=useMemo(()=>entries.filter(t=>(typeFilter==="all"||t.type===typeFilter)&&(categoryFilter==="all"||t.category===categoryFilter)&&(month==="all"||t.date.startsWith(month))&&`${t.description} ${t.category} ${t.note||""}`.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id)),[entries,typeFilter,categoryFilter,month,search]);
  const summaryEntries=entries.filter(t=>month==="all"||t.date.startsWith(month));

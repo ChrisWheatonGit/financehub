@@ -58,3 +58,11 @@ git push -u origin main
 Choose **Transactions** from the FinanceHub sidebar to open an interactive fictional-data module. You can add, edit, delete, filter, search, and export CSV transactions. Income, expenses, net cash flow, and category totals respond to those changes. Demo records persist in this browser's `localStorage` (`financehub:fictional-transactions:v1`). Click **Reset sample data** to restore the sample records.
 
 **Do not enter real financial or personal data.** This local preview has no authentication, encrypted storage, private accounts, or secure database-backed access. Its figures do not yet update the separate demo dashboard; that integration is planned for the database phase.
+
+## v0.3 dashboard integration
+
+- Dashboard and Transactions use the same browser-local fictional records (existing v0.2 data retained).
+- Income, spending, cash flow, categories, and recent activity update after creating/editing/deleting transactions.
+- Dashboard period selector changes monthly summaries and the six-month graph. Recent activity remains the latest four records across all months.
+- Net cash flow is **not** an actual checking balance. Debt and savings figures remain fictional placeholders.
+- **Never enter actual financial data**. The browser storage is not encrypted, authenticated, or multi-user.
