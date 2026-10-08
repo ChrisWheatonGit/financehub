@@ -1,0 +1,46 @@
+// Planned account-isolated data model. Not connected to the demo dashboard yet.
+// Migration and authentication integration are Phase 1 follow-up tasks.
+generator client { provider = "prisma-client-js" }
+datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  createdAt DateTime @default(now())
+  accounts Account[]
+  categories Category[]
+  transactions Transaction[]
+}
+model Account {
+  id String @id @default(uuid())
+  userId String
+  name String
+  type String
+  currency String @default("USD")
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  @@index([userId])
+  @@unique([id, userId])
+}
+model Category {
+  id String @id @default(uuid())
+  userId String
+  name String
+  type String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  @@unique([userId, name, type])
+  @@unique([id, userId])
+}
+model Transaction {
+  id String @id @default(uuid())
+  userId String
+  accountId String
+  categoryId String?
+  amountCents BigInt
+  occurredAt DateTime
+  description String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account Account @relation(fields: [accountId, userId], references: [id, userId], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId, userId], references: [id, userId])
+  @@index([userId, occurredAt])
+}
