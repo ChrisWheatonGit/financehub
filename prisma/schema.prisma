@@ -1,20 +1,62 @@
-// FinanceHub joint-household data model. NOT yet connected to the demo UI.
-// Prisma 6 datasource syntax; always apply migrations against a disposable dev database first.
 generator client { provider = "prisma-client-js" }
 datasource db { provider = "postgresql" url = env("DATABASE_URL") }
 
 enum HouseholdRole { OWNER CO_OWNER }
-enum TransactionKind { EXPENSE INCOME TRANSFER SETTLEMENT ADJUSTMENT }
 enum InvitationState { PENDING ACCEPTED REVOKED }
+enum TransactionKind { EXPENSE INCOME TRANSFER SETTLEMENT ADJUSTMENT }
 
+// Better Auth Prisma adapter tables. Apply schema changes with reviewed migrations.
 model User {
- id String @id @default(uuid()) @db.Uuid
+ id String @id
+ name String
  email String @unique
- displayName String?
+ emailVerified Boolean @default(false)
+ image String?
  createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ sessions Session[]
+ accounts Account[]
  memberships HouseholdMember[]
  sentInvitations HouseholdInvitation[] @relation("Inviter")
  createdTransactions LedgerTransaction[] @relation("Creator")
+}
+model Session {
+ id String @id
+ expiresAt DateTime
+ token String @unique
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ ipAddress String?
+ userAgent String?
+ userId String
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ @@index([userId])
+}
+model Account {
+ id String @id
+ accountId String
+ providerId String
+ userId String
+ accessToken String? @db.Text
+ refreshToken String? @db.Text
+ idToken String? @db.Text
+ accessTokenExpiresAt DateTime?
+ refreshTokenExpiresAt DateTime?
+ scope String?
+ password String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ @@index([userId])
+}
+model Verification {
+ id String @id
+ identifier String
+ value String @db.Text
+ expiresAt DateTime
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ @@index([identifier])
 }
 model Household {
  id String @id @default(uuid()) @db.Uuid
@@ -26,11 +68,10 @@ model Household {
  categories FinancialCategory[]
  transactions LedgerTransaction[]
  splits ExpenseSplit[]
- @@index([createdAt])
 }
 model HouseholdMember {
  householdId String @db.Uuid
- userId String @db.Uuid
+ userId String
  role HouseholdRole @default(CO_OWNER)
  joinedAt DateTime @default(now())
  household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
@@ -45,7 +86,7 @@ model HouseholdInvitation {
  householdId String @db.Uuid
  email String
  tokenHash String @unique
- invitedById String @db.Uuid
+ invitedById String
  role HouseholdRole @default(CO_OWNER)
  state InvitationState @default(PENDING)
  expiresAt DateTime
@@ -54,7 +95,6 @@ model HouseholdInvitation {
  household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
  inviter User @relation("Inviter",fields:[invitedById],references:[id])
  @@index([householdId,email,state])
- @@index([expiresAt])
 }
 model FinancialAccount {
  id String @id @default(uuid()) @db.Uuid
@@ -83,8 +123,8 @@ model LedgerTransaction {
  householdId String @db.Uuid
  accountId String @db.Uuid
  categoryId String? @db.Uuid
- createdById String @db.Uuid
- paidByUserId String? @db.Uuid
+ createdById String
+ paidByUserId String?
  kind TransactionKind
  amountCents BigInt
  currency String @default("USD")
@@ -101,12 +141,11 @@ model LedgerTransaction {
  splits ExpenseSplit[]
  @@unique([id,householdId])
  @@index([householdId,occurredAt])
- @@index([accountId,occurredAt])
 }
 model ExpenseSplit {
  transactionId String @db.Uuid
  householdId String @db.Uuid
- userId String @db.Uuid
+ userId String
  amountCents BigInt
  transaction LedgerTransaction @relation(fields:[transactionId,householdId],references:[id,householdId],onDelete:Cascade)
  household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
