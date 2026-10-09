@@ -1,3 +1,9 @@
+# FinanceHub v1.3 — Joint Household Foundation
+
+This release **retains browser-only demo storage**. It adds configurable transaction payer and split percentages and a Prisma household model for the upcoming authenticated backend. **Do not use real financial data.** No multi-device synchronization, database migrations, account registration, invitation sending, or secure multi-user isolation is active yet.
+
+See `docs/HOUSEHOLD-ARCHITECTURE.md` and `docs/HOUSEHOLD-RELEASE-GATES.md` before attempting to connect this schema to production.
+
 # FinanceHub
 
 Open-source, self-hosted personal finance application (early development starter).
@@ -105,3 +111,8 @@ Transactions remain the only source of actual *recorded* income/expense cash flo
 ### Verification
 
 Run `npm install`, `npm run build`, and `npm run dev`. Test all theme modes, refresh persistence, dashboard updates when returning from each planning module, and all existing create/edit/delete functions. Only use fictional data.
+
+
+## v1.1 demo expansion
+
+Adds Accounts, Net Worth, Bills & Payments, Reports & Analytics, Income & Paychecks and No-Spend Tracker. Income, reports and no-spend metrics derive from the existing transaction ledger; bills are planning commitments only and do not create duplicate transactions. Accounts are manual snapshots and not connected to transaction postings yet. **Net worth is approximate and will double count any retirement account also manually entered under Accounts.** No real financial records should be stored in this development version. See `docs/V1.1-QA.md`.

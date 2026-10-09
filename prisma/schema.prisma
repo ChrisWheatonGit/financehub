@@ -1,46 +1,116 @@
-// Planned account-isolated data model. Not connected to the demo dashboard yet.
-// Migration and authentication integration are Phase 1 follow-up tasks.
+// FinanceHub joint-household data model. NOT yet connected to the demo UI.
+// Prisma 6 datasource syntax; always apply migrations against a disposable dev database first.
 generator client { provider = "prisma-client-js" }
 datasource db { provider = "postgresql" url = env("DATABASE_URL") }
+
+enum HouseholdRole { OWNER CO_OWNER }
+enum TransactionKind { EXPENSE INCOME TRANSFER SETTLEMENT ADJUSTMENT }
+enum InvitationState { PENDING ACCEPTED REVOKED }
+
 model User {
-  id String @id @default(uuid())
-  email String @unique
-  createdAt DateTime @default(now())
-  accounts Account[]
-  categories Category[]
-  transactions Transaction[]
+ id String @id @default(uuid()) @db.Uuid
+ email String @unique
+ displayName String?
+ createdAt DateTime @default(now())
+ memberships HouseholdMember[]
+ sentInvitations HouseholdInvitation[] @relation("Inviter")
+ createdTransactions LedgerTransaction[] @relation("Creator")
 }
-model Account {
-  id String @id @default(uuid())
-  userId String
-  name String
-  type String
-  currency String @default("USD")
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-  @@index([userId])
-  @@unique([id, userId])
+model Household {
+ id String @id @default(uuid()) @db.Uuid
+ name String
+ createdAt DateTime @default(now())
+ memberships HouseholdMember[]
+ invitations HouseholdInvitation[]
+ accounts FinancialAccount[]
+ categories FinancialCategory[]
+ transactions LedgerTransaction[]
+ splits ExpenseSplit[]
+ @@index([createdAt])
 }
-model Category {
-  id String @id @default(uuid())
-  userId String
-  name String
-  type String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
-  @@unique([userId, name, type])
-  @@unique([id, userId])
+model HouseholdMember {
+ householdId String @db.Uuid
+ userId String @db.Uuid
+ role HouseholdRole @default(CO_OWNER)
+ joinedAt DateTime @default(now())
+ household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
+ user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+ allocations ExpenseSplit[]
+ payments LedgerTransaction[] @relation("Payer")
+ @@id([householdId,userId])
+ @@index([userId])
 }
-model Transaction {
-  id String @id @default(uuid())
-  userId String
-  accountId String
-  categoryId String?
-  amountCents BigInt
-  occurredAt DateTime
-  description String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  account Account @relation(fields: [accountId, userId], references: [id, userId], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId, userId], references: [id, userId])
-  @@index([userId, occurredAt])
+model HouseholdInvitation {
+ id String @id @default(uuid()) @db.Uuid
+ householdId String @db.Uuid
+ email String
+ tokenHash String @unique
+ invitedById String @db.Uuid
+ role HouseholdRole @default(CO_OWNER)
+ state InvitationState @default(PENDING)
+ expiresAt DateTime
+ acceptedAt DateTime?
+ createdAt DateTime @default(now())
+ household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
+ inviter User @relation("Inviter",fields:[invitedById],references:[id])
+ @@index([householdId,email,state])
+ @@index([expiresAt])
+}
+model FinancialAccount {
+ id String @id @default(uuid()) @db.Uuid
+ householdId String @db.Uuid
+ name String
+ type String
+ currency String @default("USD")
+ createdAt DateTime @default(now())
+ household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
+ transactions LedgerTransaction[]
+ @@unique([id,householdId])
+ @@index([householdId])
+}
+model FinancialCategory {
+ id String @id @default(uuid()) @db.Uuid
+ householdId String @db.Uuid
+ name String
+ type String
+ household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
+ transactions LedgerTransaction[]
+ @@unique([id,householdId])
+ @@unique([householdId,name,type])
+}
+model LedgerTransaction {
+ id String @id @default(uuid()) @db.Uuid
+ householdId String @db.Uuid
+ accountId String @db.Uuid
+ categoryId String? @db.Uuid
+ createdById String @db.Uuid
+ paidByUserId String? @db.Uuid
+ kind TransactionKind
+ amountCents BigInt
+ currency String @default("USD")
+ occurredAt DateTime
+ description String
+ notes String?
+ createdAt DateTime @default(now())
+ updatedAt DateTime @updatedAt
+ household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
+ account FinancialAccount @relation(fields:[accountId,householdId],references:[id,householdId])
+ category FinancialCategory? @relation(fields:[categoryId,householdId],references:[id,householdId])
+ creator User @relation("Creator",fields:[createdById],references:[id])
+ payer HouseholdMember? @relation("Payer",fields:[householdId,paidByUserId],references:[householdId,userId])
+ splits ExpenseSplit[]
+ @@unique([id,householdId])
+ @@index([householdId,occurredAt])
+ @@index([accountId,occurredAt])
+}
+model ExpenseSplit {
+ transactionId String @db.Uuid
+ householdId String @db.Uuid
+ userId String @db.Uuid
+ amountCents BigInt
+ transaction LedgerTransaction @relation(fields:[transactionId,householdId],references:[id,householdId],onDelete:Cascade)
+ household Household @relation(fields:[householdId],references:[id],onDelete:Cascade)
+ member HouseholdMember @relation(fields:[householdId,userId],references:[householdId,userId])
+ @@id([transactionId,userId])
+ @@index([householdId,userId])
 }
