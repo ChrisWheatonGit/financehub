@@ -1,19 +1,19 @@
-CommonSense UI Refresh
+CommonSense - Six Coordinated Sage & Charcoal Palettes
 
-1. Extract this ZIP anywhere (for example Downloads\commonsense-ui-refresh).
-2. Open a PowerShell terminal in your existing project: C:\Github Projects\CommonCents
-3. Run:
-   powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$env:USERPROFILE\Downloads\commonsense-ui-refresh\Install-CommonSense.ps1"
-   (adjust the extracted path if necessary; inspect the script before running)
-4. Run: npm run build
-5. Run: npm run dev and hard-refresh the page (Ctrl+Shift+R).
+Includes:
+  src/app/globals.css
+  src/lib/personalization.ts
+  src/components/appearance-settings.tsx
 
-The script changes only src/app/page.tsx, src/app/household/page.tsx,
-src/app/layout.tsx, src/app/globals.css and public/commonsense-mark.svg.
-It backs up original four files in a dated .commonsense-backup-* directory
-inside your project. It preserves PostgreSQL, Prisma, authentication,
-Docker configuration and existing financehub localStorage keys.
+Theme options: Sage & Charcoal, Eucalyptus Slate, Silver Sage, Stone & Moss,
+Ash & Fern, Juniper Charcoal. The internal palette IDs are retained so
+existing browser localStorage selections continue to work.
 
-Note: The working copy on your PC was not available for test-build here.
-If a build or hydration error remains, upload the actual current project ZIP
-(excluding node_modules, .next, .env and secrets) for an exact audited update.
+Install: back up the three existing files. Extract this ZIP at the CommonCents
+project root, replacing matching files. Run npm run build, then restart npm run dev.
+
+If colors appear unchanged, hard-refresh the browser; select another palette,
+then return to the preferred palette. The palette is stored under the existing
+financehub:palette:v1 browser localStorage key for backward compatibility.
+
+No database, login, API, or Docker code is modified.

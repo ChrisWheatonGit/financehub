@@ -1,10 +1,10 @@
 export const PALETTES = [
- {id:"sage",name:"Sage Garden",description:"Soft sage and quiet greenery",light:"#f4f7f2",dark:"#141f1b",accent:"#638875",deep:"#345746",soft:"#d8e6db"},
- {id:"coastal",name:"Coastal Mist",description:"Sea glass and washed blue",light:"#f1f7f8",dark:"#142329",accent:"#5b8995",deep:"#315760",soft:"#d6e7e9"},
- {id:"lavender",name:"Lavender Haze",description:"Soft lilac and gentle gray",light:"#f7f4fa",dark:"#211c2a",accent:"#8e7da9",deep:"#574667",soft:"#e5daee"},
- {id:"sand",name:"Warm Sand",description:"Cream and understated earth",light:"#f9f6f1",dark:"#26211d",accent:"#9c8267",deep:"#64503c",soft:"#e9ddce"},
- {id:"rose",name:"Dusty Rose",description:"Calming blush and stone",light:"#faf5f5",dark:"#281e24",accent:"#a47d89",deep:"#664852",soft:"#eedde1"},
- {id:"forest",name:"Forest Retreat",description:"Eucalyptus and woodland",light:"#f2f6f2",dark:"#15221c",accent:"#5f8571",deep:"#355746",soft:"#d7e4d8"}
+ {id:"sage",name:"Sage & Charcoal",description:"Balanced muted sage, signature CommonSense",light:"#F7F8F6",dark:"#15191C",accent:"#8FA89A",deep:"#617B6D",soft:"#EDF2ED"},
+ {id:"coastal",name:"Eucalyptus Slate",description:"Cool eucalyptus with graphite undertones",light:"#F7F8F8",dark:"#15191C",accent:"#8CA9A3",deep:"#607D79",soft:"#EDF2F1"},
+ {id:"lavender",name:"Silver Sage",description:"Silvery sage and softened graphite",light:"#F8F9F7",dark:"#15191C",accent:"#9BAA9F",deep:"#737F77",soft:"#F0F2EF"},
+ {id:"sand",name:"Stone & Moss",description:"Warm gray stone with quiet moss",light:"#F9F9F6",dark:"#15191C",accent:"#9EA994",deep:"#73796A",soft:"#F1F2ED"},
+ {id:"rose",name:"Ash & Fern",description:"Soft ash-gray with fern accents",light:"#F7F8F7",dark:"#15191C",accent:"#99ADA5",deep:"#6D827B",soft:"#EFF2F0"},
+ {id:"forest",name:"Juniper Charcoal",description:"Subtle deep juniper against dark slate",light:"#F6F8F7",dark:"#15191C",accent:"#829E95",deep:"#506B65",soft:"#ECF1EF"},
 ] as const;
 export type PaletteId = typeof PALETTES[number]["id"];
 export type Profile = {displayName:string;career:string;company:string;location:string;bio:string;avatar:string};
