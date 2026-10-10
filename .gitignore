@@ -1,9 +1,31 @@
-node_modules
-.next
-out
+# Dependencies
+node_modules/
+
+# Next.js build files
+.next/
+out/
+
+# Environment variables and secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+
+# Logs
 *.log
+
+# Operating system files
 .DS_Store
-coverage
+Thumbs.db
+
+# Testing
+coverage/
+
+# Local database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Private financial documents
+private/
+uploads/
+backups/
