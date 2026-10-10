@@ -1,4 +1,4 @@
-# FinanceHub
+# CommonCents
 
 Open-source, self-hosted personal finance application (early development starter).
 
